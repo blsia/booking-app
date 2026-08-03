@@ -1,12 +1,21 @@
-import { PrismaClient } from "@prisma/client";
+// Import PrismaClient sesuai output generator (v7.9.0)
+import { PrismaClient } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import pg from 'pg';
 
 const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient;
+  prisma: PrismaClient | undefined;
 };
 
-export const prisma =
-  globalForPrisma.prisma || new PrismaClient();
+// URL Neon dari Vercel/Neon Dashboard
+const connectionString = process.env.POSTGRES_URL || process.env.DATABASE_URL;
 
-if (process.env.NODE_ENV !== "production") {
+const pool = new pg.Pool({ connectionString });
+const adapter = new PrismaPg(pool);
+
+export const prisma =
+  globalForPrisma.prisma || new PrismaClient({ adapter });
+
+if (process.env.NODE_ENV !== 'production') {
   globalForPrisma.prisma = prisma;
 }
