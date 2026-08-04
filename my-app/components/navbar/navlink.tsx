@@ -2,13 +2,29 @@
 
 import { useState } from "react";
 import { IoClose, IoMenu } from "react-icons/io5";
+import Image from "next/image";
 import clsx from "clsx";
+import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
 
 const Navlink = () => {
     const [open, setOpen] = useState(false);
+    const { data: session } = useSession();
+
     return (
-         <>
+         <> 
+          {session?.user ? (
+            <div className="flex items-center justify-end md:orer-2">
+                <div className="hidden text-sm bg-gray-50 border rounded-full md:me-0 md:block focus:ring-4 focus:ring-gray-300">
+                    <Image className="size-8 rounded-full" src={session.user.image || "/avatar.svg"} width={64} height={64} alt="avatar"/>
+                </div>
+                <div className="flex items-center">
+                    <button className="md:block hidden py-2 px-4 bg-gray-50 text-gray-700 hover:bg-gray-100 rounded-sm cursor-pointer" onClick={() => signOut()}>
+                        Sign Out
+                    </button>
+                </div>
+            </div>
+          ):null}
             <button
                 type="button"
                 onClick={() => setOpen(!open)}
@@ -39,26 +55,45 @@ const Navlink = () => {
                                 Contact 
                             </Link>
                         </li>
-                        <li>
-                            <Link href="/myreservation" className="block py-2 px-3 text-gray-800 hover:bg-gray-100 rounded_sm md:hover:bg-transparent md:p-0">
-                                Myreservation
+                        {session && (
+                            <>
+                                 <li>
+                                    <Link href="/myreservation" className="block py-2 px-3 text-gray-800 hover:bg-gray-100 rounded-sm md:hover:bg-transparent md:p-0">
+                                        Myreservation
+                                    </Link>
+                                </li>
+                                {session.user.role === "admin" && (
+                                    <>
+                                        <li>
+                                            <Link href="/admin/dashboard" className="block py-2 px-3 text-gray-800 hover:bg-gray-100 rounded-sm md:hover:bg-transparent md:p-0">
+                                                Dashboard
+                                            </Link>
+                                        </li>
+                                        <li>
+                                            <Link href="/admin/rooms" className="block py-2 px-3 text-gray-800 hover:bg-gray-100 rounded-sm md:hover:bg-transparent md:p-0">
+                                                Manage Rooms
+                                            </Link>
+                                        </li>
+                                    </>
+                                )}
+                            </>
+                        )}
+                        {session ? (
+                                                    <li className="pt-2 md:pt-0">
+                            <button 
+                            onClick={() => signOut()}  
+                             className=" md:hidden px-4 bg-red-500 text-white py-2.5 hover:bg-red-600 rounded-sm cursor-pointer" >
+                                Sign Out
+                            </button>
+                        </li>
+                        ) : (
+                                                    <li className="pt-2 md:pt-0">
+                            <Link href="/signin" className="py-2.5 px-6 bg-orange-400 text-white rounded-sm hover:bg-orange-500">
+                                Sign In
                             </Link>
                         </li>
-                        <li>
-                            <Link href="/admin/dashboard" className="block py-2 px-3 text-gray-800 hover:bg-gray-100 rounded_sm md:hover:bg-transparent md:p-0">
-                             Dashboard
-                            </Link>
-                        </li>
-                        <li>
-                              <Link href="/admin/rooms" className="block py-2 px-3 text-gray-800 hover:bg-gray-100 rounded_sm md:hover:bg-transparent md:p-0">
-                                Manage Rooms
-                            </Link>
-                        </li>
-                        <li className="pt-2 md:pt-0">
-                            <Link href="signin" className="py-2.5 px-6 bg-orange-400 text-white rounded-sm hover:bg-orange-500">
-                            Sign In
-                            </Link>
-                        </li>
+                        )}
+
                 </ul>
             </div>
          </>

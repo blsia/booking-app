@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Raleway } from "next/font/google";
 import Navbar from "@/components/navbar/navbar";
 import Footer from "@/components/footer";
+import { SessionProvider } from "next-auth/react";
+import { auth } from "@/auth";
 import "./globals.css";
 
 const raleway = Raleway({
@@ -17,17 +19,21 @@ export const metadata: Metadata = {
   description: "Online Booking Hotel",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
+  const session = await auth();
   return (
     <html lang="en" className={`${raleway.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
-        <Navbar />
+        <SessionProvider session={session}>
+                  <Navbar />
         <main className="bg-gray-50 min-h-screen">{children}</main>
         <Footer />
+        </SessionProvider>
       </body>
     </html>
   );
