@@ -1,0 +1,17 @@
+node_modules
+.next
+docker-compose.yml
+Dockerfile
+.git
+.gitignore
+README.md
+.eslintcache
+.cache
+.prisma
+vercel
+output-files
+.env
+.env.* 
+npm-debug.log
+yarn-error.log
+pnpm-debug.log

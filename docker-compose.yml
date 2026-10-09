@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: bookingapp
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  app:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - POSTGRES_URL=postgresql://postgres:postgres@db:5432/bookingapp?schema=public
+      - POSTGRES_URL_NON_POOLING=postgresql://postgres:postgres@db:5432/bookingapp?schema=public
+      - NEXTAUTH_SECRET=changemeplease
+      - NEXTAUTH_URL=http://localhost:3000
+    depends_on:
+      - db
+
+volumes:
+  pgdata:
